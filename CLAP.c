@@ -242,6 +242,10 @@ int strcmp_long_option(const char *str, const char *str_with_equals) {
 
     if(*str == '\0' && (*str_with_equals == '\0' || *str_with_equals == '='))
         return 0;
+    else if (*str == 0)
+        return *str_with_equals;
+    else if (*str_with_equals == 0)
+        return *str;
     else
         return (*str < *str_with_equals) ? -*str : *str_with_equals;
 }
