@@ -183,13 +183,15 @@ int clap_option_short(ClapHandler *handler, char opt, int flags) {
     ClapOption * options = handler->options;
 
     while(options->type != CLAP_OPT_END) {
-        if (options->short_option == opt) {
-            if ((flags & _FLAG_REQUIRE_NO_VAL) && (options-> type != CLAP_OPT_BOOL || options->type == CLAP_OPT_NONE)) {
-                clap_error(handler, options, "is not bundlable", 0);
-                return -2;
-            }
+        if (options->type != CLAP_OPT_GROUP) {
+            if (options->short_option == opt) {
+                if ((flags & _FLAG_REQUIRE_NO_VAL) && (options-> type != CLAP_OPT_BOOL || options->type == CLAP_OPT_NONE)) {
+                    clap_error(handler, options, "is not bundlable", 0);
+                    return -2;
+                }
 
-            return clap_option_set_value(handler, options, false);
+                return clap_option_set_value(handler, options, false);
+            }
         }
 
         options++;
@@ -209,8 +211,11 @@ int clap_option_positional(ClapHandler *handler, char *opt, int flags) {
     ClapOption * options = handler->options;
 
     while(options->type != CLAP_OPT_END) {
-        if (options->flags & CLAP_FLAG_POSITIONAL && !(options->flags & CLAP_FLAG_SET)) {
-            return clap_option_set_value(handler, options, flags | _FLAG_OPT_POSITIONAL);
+
+        if (options->type != CLAP_OPT_GROUP) {
+            if (options->flags & CLAP_FLAG_POSITIONAL && !(options->flags & CLAP_FLAG_SET)) {
+                return clap_option_set_value(handler, options, flags | _FLAG_OPT_POSITIONAL);
+            }
         }
 
         options++;
@@ -258,8 +263,10 @@ int clap_option_long(ClapHandler *handler, char *opt, int flags) {
     }
 
     while(options->type != CLAP_OPT_END) {
-        if (strcmp_long_option(options->long_option, opt) == 0) {
-            return clap_option_set_value(handler, options, flags | _FLAG_OPT_LONG);
+        if (options->type != CLAP_OPT_GROUP) {
+            if (strcmp_long_option(options->long_option, opt) == 0) {
+                return clap_option_set_value(handler, options, flags | _FLAG_OPT_LONG);
+            }
         }
 
         options++;
